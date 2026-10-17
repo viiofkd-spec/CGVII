@@ -1,0 +1,30 @@
+name: Build CyberGodVocal VST3
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-vst3:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile VST3 and Standalone
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Package VST3 & App for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: CyberGodVocal-v2-${{ matrix.os }}
+          path: |
+            build/CyberGodVocal_artefacts/Release/VST3/**
+            build/CyberGodVocal_artefacts/Release/Standalone/**
